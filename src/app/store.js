@@ -1,8 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+
+import userInputReducer from './slices/userInputSlice';
+import seatsDataReducer from './slices/seatsDataSlice';
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    userInput: userInputReducer,
+    seats: seatsDataReducer,
   },
 });
