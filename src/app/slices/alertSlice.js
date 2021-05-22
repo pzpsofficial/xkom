@@ -12,7 +12,9 @@ const initialState = {
     left: '50%',
     transform: 'translateX(-50%)',
     maxWidth: '500px',
+    zIndex: '1000',
   },
+  alertAction: null,
 };
 
 export const alertSlice = createSlice({
@@ -20,17 +22,20 @@ export const alertSlice = createSlice({
   initialState,
   reducers: {
     setAlert: (state, action) => {
-      const { message, description, type, closable } = action.payload;
+      const { message, description, type, closable, alertAction } =
+        action.payload;
 
       state.message = message;
       state.description = description;
       state.type = type;
       state.closable = closable;
+      state.alertAction = alertAction;
     },
     removeAlert: (state) => {
       state.message = '';
       state.description = '';
       state.type = '';
+      state.alertAction = undefined;
     },
   },
 });

@@ -3,7 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { setAlert, removeAlert } from '../../app/slices/alertSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { setSeats } from '../../app/slices/seatsDataSlice';
+import {
+  setSeats,
+  setUserSeat,
+  clearUserSeats,
+} from '../../app/slices/seatsDataSlice';
 import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Avatar, Space, Button, Spin } from 'antd';
@@ -11,7 +15,7 @@ import { Row, Col, Avatar, Space, Button, Spin } from 'antd';
 const ReservationPage = () => {
   const dispatch = useDispatch();
   const userInput = useSelector((state) => state.userInput);
-  const { seats } = useSelector((state) => state.seats);
+  const { seats, userSeats } = useSelector((state) => state.seats);
 
   const history = useHistory();
 
@@ -19,15 +23,36 @@ const ReservationPage = () => {
 
   const handleSubmit = (e) => {
     try {
+      if (userInput.seatsNumber !== userSeats.length)
+        throw new Error(
+          `Hej, powinnienieś zarezerwować następującą ilość miejsc: ${userInput.seatsNumber}. \nJeśli zmieniłeś zdanie wróć na stronę główną.`
+        );
+
       history.push('/summary');
     } catch (error) {
-      console.log(error);
+      dispatch(
+        setAlert({
+          message: 'Ostrzeżenie',
+          description: error.message,
+          type: 'warning',
+          closable: true,
+          alertAction: (
+            <Button onClick={() => history.push('/')}>Strona główna</Button>
+          ),
+        })
+      );
+
+      setTimeout(() => {
+        dispatch(removeAlert());
+      }, 5000);
     }
   };
 
   useEffect(() => {
     const fetchSeats = async () => {
       try {
+        dispatch(clearUserSeats());
+
         if (seats.length > 0) return;
 
         setIsLoading(true);
@@ -74,6 +99,33 @@ const ReservationPage = () => {
     fetchSeats();
   }, [dispatch, seats]);
 
+  const markSeatAsTaken = (seat) => {
+    try {
+      if (!seat) return;
+      if (seat.reserved)
+        throw new Error('Nie możesz wybrać zarezerwowanego miejsca!');
+      if (
+        userSeats.length >= userInput.seatsNumber &&
+        !userSeats.includes(seat)
+      )
+        throw new Error('Nie możesz wybrać więcej miejsc niż zadeklarowałeś!');
+
+      dispatch(setUserSeat(seat));
+    } catch (error) {
+      dispatch(
+        setAlert({
+          message: 'Błąd',
+          description: error.message,
+          type: 'error',
+        })
+      );
+
+      setTimeout(() => {
+        dispatch(removeAlert());
+      }, 5000);
+    }
+  };
+
   return (
     <React.Fragment>
       <Row
@@ -85,27 +137,33 @@ const ReservationPage = () => {
         {seats.length > 0
           ? seats.map((column) => (
               <Col>
-                {column.map((seat) => (
-                  <Col style={{ marginBottom: '10px' }}>
-                    <Avatar
-                      shape="square"
-                      size="large"
-                      style={{
-                        backgroundColor: `${
-                          seat && seat.reserved ? '#434343' : 'white'
-                        }`,
-                        border: '1px solid',
-                        borderColor: `${seat ? 'black' : 'transparent'}`,
-                      }}
-                    />
-                  </Col>
-                ))}
+                {column.map((seat) => {
+                  const backgroundColor =
+                    seat && seat.reserved
+                      ? '#434343'
+                      : seat && userSeats.includes(seat)
+                      ? '#fa8c16'
+                      : 'white';
+
+                  return (
+                    <Col style={{ marginBottom: '10px' }}>
+                      <Avatar
+                        onClick={() => markSeatAsTaken(seat)}
+                        shape="square"
+                        size="large"
+                        style={{
+                          backgroundColor: backgroundColor,
+                          border: '1px solid',
+                          borderColor: `${seat ? 'black' : 'transparent'}`,
+                        }}
+                      />
+                    </Col>
+                  );
+                })}
               </Col>
             ))
           : null}
-        {isLoading ? (
-          <Spin size="large" tip="Ładowanie..." spinning="true" />
-        ) : null}
+        {isLoading ? <Spin size="large" tip="Ładowanie..." /> : null}
       </Row>
       <Row justify="center" align="middle">
         <Space size={30} justify="center">

@@ -10,9 +10,8 @@ import ErrorPage from './Pages/404/ErrorPage';
 import { Alert } from 'antd';
 
 function App() {
-  const { message, description, closable, type, showIcon, style } = useSelector(
-    (state) => state.alert
-  );
+  const { message, description, closable, type, showIcon, style, alertAction } =
+    useSelector((state) => state.alert);
 
   return (
     <BrowserRouter>
@@ -24,6 +23,7 @@ function App() {
           closable={closable}
           type={type}
           showIcon={showIcon}
+          action={alertAction}
         />
       ) : null}
       <Switch>
