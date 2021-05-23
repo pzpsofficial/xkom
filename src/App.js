@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import HomePage from './Pages/HomePage/HomePage';
 import ReservationPage from './Pages/ReservationPage/ReservationPage';
@@ -12,6 +12,9 @@ import { Alert } from 'antd';
 function App() {
   const { message, description, closable, type, showIcon, style, alertAction } =
     useSelector((state) => state.alert);
+
+  const { seatsNumber } = useSelector((state) => state.userInput);
+  const { userSeats } = useSelector((state) => state.seats);
 
   return (
     <BrowserRouter>
@@ -31,10 +34,10 @@ function App() {
           <HomePage />
         </Route>
         <Route path="/reservation">
-          <ReservationPage />
+          {seatsNumber ? <ReservationPage /> : <Redirect to="/" />}
         </Route>
         <Route path="/summary">
-          <SummaryPage />
+          {userSeats.length > 0 ? <SummaryPage /> : <Redirect to="/" />}
         </Route>
         <Route path="*">
           <ErrorPage />
