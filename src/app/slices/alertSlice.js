@@ -23,15 +23,21 @@ export const alertSlice = createSlice({
     setAlert: (state, action) => {
       const { message, description, type, closable } = action.payload;
 
-      state.message = message;
-      state.description = description;
-      state.type = type;
-      state.closable = closable;
+      return {
+        ...state,
+        message: message,
+        description: description,
+        type: type,
+        closable: closable,
+      };
     },
     removeAlert: (state) => {
-      state.message = '';
-      state.description = '';
-      state.type = '';
+      return {
+        ...state,
+        message: '',
+        description: '',
+        type: '',
+      };
     },
   },
 });

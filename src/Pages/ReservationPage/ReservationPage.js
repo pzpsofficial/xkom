@@ -5,8 +5,8 @@ import axios from 'axios';
 import { checkSeat, displayAlert } from '../../utils/Functions';
 import {
   setSeats,
-  setUserSeat,
   clearUserSeats,
+  insertNewlyReservedSeats,
 } from '../../app/slices/seatsDataSlice';
 import { useHistory } from 'react-router-dom';
 
@@ -18,9 +18,10 @@ import { Row, Spin } from 'antd';
 const ReservationPage = () => {
   const dispatch = useDispatch();
   const userInput = useSelector((state) => state.userInput);
-  const { seats, userSeats } = useSelector((state) => state.seats);
+  const { seats } = useSelector((state) => state.seats);
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
+  const [userSeats, setUserSeats] = useState([]);
 
   const markSeatAsTaken = (seat) => {
     try {
@@ -33,9 +34,18 @@ const ReservationPage = () => {
       )
         throw new Error('Nie możesz wybrać więcej miejsc niż zadeklarowałeś!');
 
-      dispatch(setUserSeat(seat));
+      const seatIndex = userSeats.findIndex((s) => s.id === seat.id);
+
+      if (seatIndex === -1) {
+        setUserSeats((oldState) => [...oldState, seat]);
+      } else {
+        setUserSeats((oldState) => [
+          ...oldState.slice(0, seatIndex),
+          ...oldState.slice(seatIndex + 1),
+        ]);
+      }
     } catch (error) {
-      displayAlert(dispatch, error);
+      displayAlert(dispatch, history, error);
     }
   };
 
@@ -46,9 +56,10 @@ const ReservationPage = () => {
           `Hej, powinnienieś zarezerwować następującą ilość miejsc: ${userInput.seatsNumber}. \nJeśli zmieniłeś zdanie wróć na stronę główną.`
         );
 
+      dispatch(insertNewlyReservedSeats(userSeats));
       history.push('/summary');
     } catch (error) {
-      displayAlert(dispatch, error);
+      displayAlert(dispatch, history, error);
     }
   };
 
@@ -65,14 +76,16 @@ const ReservationPage = () => {
 
         if (!areSeatsClose) {
           for (let i = 0; i < numberOfSeats; i++) {
-            dispatch(setUserSeat(freeSeats[i]));
+            setUserSeats((oldState) => [...oldState, freeSeats[i]]);
           }
         } else {
           for (let i = 0; i < freeSeats.length; i++) {
             const result = checkSeat(i, numberOfSeats, freeSeats);
 
             if (result.length === numberOfSeats) {
-              result.forEach((seat) => dispatch(setUserSeat(seat)));
+              result.forEach((seat) =>
+                setUserSeats((oldState) => [...oldState, seat])
+              );
               break;
             }
 
@@ -82,10 +95,10 @@ const ReservationPage = () => {
           }
         }
       } catch (error) {
-        displayAlert(dispatch, error);
+        displayAlert(dispatch, history, error);
       }
     },
-    [dispatch]
+    [dispatch, history]
   );
 
   useEffect(() => {
@@ -118,7 +131,7 @@ const ReservationPage = () => {
         dispatch(setSeats(sortedData));
       } catch (error) {
         setIsLoading(false);
-        displayAlert(dispatch, error);
+        displayAlert(dispatch, history, error);
       }
     };
 
@@ -126,7 +139,7 @@ const ReservationPage = () => {
 
     if (seats.length <= 0) return;
     findMatchingSeats(userInput.seatsNumber, userInput.areSeatsClose, seats);
-  }, [dispatch, seats, userInput, findMatchingSeats]);
+  }, [dispatch, seats, userInput, findMatchingSeats, history]);
 
   return (
     <React.Fragment>

@@ -10,25 +10,35 @@ export const seatsDataSlice = createSlice({
   initialState,
   reducers: {
     setSeats: (state, action) => {
-      state.seats = action.payload;
+      return {
+        ...state,
+        seats: action.payload,
+      };
     },
-    setUserSeat: (state, action) => {
-      const seatIndex = state.userSeats.findIndex(
-        (seat) => seat.id === action.payload.id
-      );
+    insertNewlyReservedSeats: (state, action) => {
+      const oldSeats = [...state.seats];
 
-      if (seatIndex === -1) {
-        state.userSeats.push(action.payload);
-      } else {
-        state.userSeats.splice(seatIndex, 1);
-      }
+      action.payload.forEach((userSeat) => {
+        const index = oldSeats.indexOf(userSeat);
+        oldSeats[index] = { ...oldSeats[index], reserved: true };
+      });
+
+      return {
+        ...state,
+        seats: [...oldSeats],
+        userSeats: action.payload,
+      };
     },
     clearUserSeats: (state) => {
-      state.userSeats = [];
+      return {
+        ...state,
+        userSeats: [],
+      };
     },
   },
 });
 
-export const { setSeats, setUserSeat, clearUserSeats } = seatsDataSlice.actions;
+export const { setSeats, clearUserSeats, insertNewlyReservedSeats } =
+  seatsDataSlice.actions;
 
 export default seatsDataSlice.reducer;

@@ -11,10 +11,16 @@ export const userInputSlice = createSlice({
 
   reducers: {
     setSeatsNumber: (state, action) => {
-      state.seatsNumber = action.payload;
+      return {
+        ...state,
+        seatsNumber: action.payload,
+      };
     },
     setAreSeatsClose: (state, action) => {
-      state.areSeatsClose = action.payload;
+      return {
+        ...state,
+        areSeatsClose: action.payload,
+      };
     },
   },
 });
