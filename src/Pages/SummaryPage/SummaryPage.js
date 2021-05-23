@@ -2,8 +2,9 @@ import React from 'react';
 
 import { Row, Space, Typography } from 'antd';
 import { useSelector } from 'react-redux';
+import ReservationsList from '../../components/ReservationsList/ReservationsList';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 const SummaryPage = () => {
   const { userSeats } = useSelector((state) => state.seats);
@@ -15,14 +16,7 @@ const SummaryPage = () => {
           Twoja rezerwacja przebiegła pomyślnie!
         </Title>
         <Space direction="vertical" size={-35}>
-          <Paragraph style={{ fontSize: '35px' }}>Wybrałeś miejsca:</Paragraph>
-          {userSeats.map((seat) => {
-            return (
-              <Paragraph style={{ fontSize: '35px' }} key={seat.id}>
-                - rząd x{seat.cords.x}, miejsce y{seat.cords.y} ({seat.id})
-              </Paragraph>
-            );
-          })}
+          <ReservationsList message="Wybrałeś miejsca:" seats={userSeats} />
         </Space>
         <Title level={2}>
           Dziękujemy! W razie problemów prosimy o kontakt z działem

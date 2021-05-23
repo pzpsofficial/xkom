@@ -7,8 +7,9 @@ import {
 import { setAlert, removeAlert } from '../../app/slices/alertSlice';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import HomePageForm from '../../components/HomePageForm/HomePageForm';
 
-import { Button, Row, Form, Checkbox, InputNumber } from 'antd';
+import { Row } from 'antd';
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,6 @@ const HomePage = () => {
     try {
       dispatch(setSeatsNumber(inputValue));
       dispatch(setAreSeatsClose(checkboxState));
-
       history.push('/reservation');
     } catch (error) {
       dispatch(
@@ -48,35 +48,13 @@ const HomePage = () => {
 
   return (
     <Row style={{ minHeight: '100vh' }} align="middle" justify={'center'}>
-      <Form onFinish={handleSubmit} colon={false}>
-        <Form.Item
-          label="Liczba miejsc: "
-          rules={[
-            {
-              required: true,
-              message: 'Podaj proszę liczbę!',
-            },
-          ]}
-          name="seatsNumber"
-        >
-          <InputNumber
-            size="medium"
-            style={{ width: '100%' }}
-            value={inputValue}
-            onChange={handleInputChange}
-            min={1}
-            max={100}
-          />
-        </Form.Item>
-        <Form.Item>
-          <Checkbox checked={checkboxState} onChange={handleCheckboxChange}>
-            Czy miejsca mają być obok siebie?
-          </Checkbox>
-        </Form.Item>
-        <Button htmlType="submit" size="large" block={true}>
-          Wybierz miejsca
-        </Button>
-      </Form>
+      <HomePageForm
+        submitHandler={handleSubmit}
+        checkboxChangeHandler={handleCheckboxChange}
+        inputChangeHandler={handleInputChange}
+        inputValue={inputValue}
+        checkboxState={checkboxState}
+      />
     </Row>
   );
 };

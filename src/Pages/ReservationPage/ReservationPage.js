@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { setAlert, removeAlert } from '../../app/slices/alertSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
+import { checkSeat, displayAlert } from '../../utils/Functions';
 import {
   setSeats,
   setUserSeat,
@@ -10,187 +10,17 @@ import {
 } from '../../app/slices/seatsDataSlice';
 import { useHistory } from 'react-router-dom';
 
-import { Row, Col, Avatar, Space, Button, Spin } from 'antd';
+import AudienceView from '../../components/AudienceView/AudienceView';
+import ReservationLegend from '../../components/ReservationLegend/ReservationLegend';
+
+import { Row, Spin } from 'antd';
 
 const ReservationPage = () => {
   const dispatch = useDispatch();
   const userInput = useSelector((state) => state.userInput);
   const { seats, userSeats } = useSelector((state) => state.seats);
-
   const history = useHistory();
-
   const [isLoading, setIsLoading] = useState(false);
-
-  const findMatchingSeats = useCallback(
-    (numberOfSeats, closeSeats, seats) => {
-      try {
-        const freeSeats = seats
-          .map((row) => row.filter((seat) => seat && !seat.reserved))
-          .flat();
-
-        if (freeSeats.length < numberOfSeats) {
-          throw new Error('Ups... Przykro nam, nie mamy tylu wolnych miejsc.');
-        }
-
-        if (!closeSeats) {
-          for (let i = 0; i < numberOfSeats; i++) {
-            const seat = freeSeats[i];
-            dispatch(setUserSeat(seat));
-          }
-        } else {
-          const checkSeat = (index) => {
-            const pickedSeats = [];
-
-            for (let i = index; i < index + numberOfSeats; i++) {
-              if (i === index) {
-                pickedSeats.push(freeSeats[i]);
-                continue;
-              }
-
-              const seat = pickedSeats.length
-                ? pickedSeats[pickedSeats.length - 1]
-                : freeSeats[i];
-
-              const nextSeat = freeSeats.find(
-                (nSeat) =>
-                  seat &&
-                  nSeat.cords.y === seat.cords.y &&
-                  nSeat.cords.x === seat.cords.x + 1
-              );
-              const prevSeat = freeSeats.find(
-                (pSeat) =>
-                  seat &&
-                  pSeat.cords.y === seat.cords.y &&
-                  pSeat.cords.x === seat.cords.x - 1
-              );
-
-              if (
-                (!nextSeat && pickedSeats.includes(prevSeat)) ||
-                (!prevSeat && pickedSeats.includes(nextSeat)) ||
-                (!prevSeat && seat && seat.cords.x > 0) ||
-                (!nextSeat && seat && seat.cords.x < 14)
-              ) {
-                pickedSeats.length = 0;
-              } else {
-                pickedSeats.push(nextSeat ? nextSeat : prevSeat);
-              }
-            }
-
-            return pickedSeats;
-          };
-
-          for (let i = 0; i < freeSeats.length; i++) {
-            const result = checkSeat(i);
-
-            if (result.length === numberOfSeats) {
-              result.forEach((seat) => dispatch(setUserSeat(seat)));
-              break;
-            }
-
-            if (i === freeSeats.length - 1 && !result.length) {
-              throw new Error('Ups... Nie mamy tylu miejsc w jednym rzędzie!');
-            }
-          }
-        }
-      } catch (error) {
-        dispatch(
-          setAlert({
-            message: 'Ostrzeżenie',
-            description: error.message,
-            type: 'warning',
-            closable: true,
-          })
-        );
-
-        setTimeout(() => {
-          dispatch(removeAlert());
-          history.push('/');
-        }, 5000);
-      }
-    },
-    [dispatch, history]
-  );
-
-  const handleSubmit = (e) => {
-    try {
-      if (userInput.seatsNumber !== userSeats.length)
-        throw new Error(
-          `Hej, powinnienieś zarezerwować następującą ilość miejsc: ${userInput.seatsNumber}. \nJeśli zmieniłeś zdanie wróć na stronę główną.`
-        );
-
-      history.push('/summary');
-    } catch (error) {
-      dispatch(
-        setAlert({
-          message: 'Ostrzeżenie',
-          description: error.message,
-          type: 'warning',
-          closable: true,
-          alertAction: (
-            <Button onClick={() => history.push('/')}>Strona główna</Button>
-          ),
-        })
-      );
-
-      setTimeout(() => {
-        dispatch(removeAlert());
-      }, 5000);
-    }
-  };
-
-  useEffect(() => {
-    const fetchSeats = async () => {
-      try {
-        dispatch(clearUserSeats());
-
-        if (seats.length > 0) return;
-
-        setIsLoading(true);
-
-        const { data } = await axios(
-          `${process.env.REACT_APP_API_ENDPOINT}/seats`
-        );
-
-        const maxY = Math.max(...data.map((seat) => seat.cords.y));
-        const maxX = Math.max(...data.map((seat) => seat.cords.x));
-
-        const sortedData = Array(maxX + 1).fill(undefined);
-
-        sortedData.forEach(
-          (_, index) =>
-            (sortedData[index] = Array(maxY + 1).fill(undefined, 0)),
-          0
-        );
-
-        data.forEach((seat) => {
-          const columnIndex = seat.cords.x;
-          const rowIndex = seat.cords.y;
-          sortedData[columnIndex][rowIndex] = seat;
-        });
-
-        setIsLoading(false);
-        dispatch(setSeats(sortedData));
-      } catch (error) {
-        setIsLoading(false);
-        dispatch(
-          setAlert({
-            message: 'Błąd',
-            description: 'Ups... Coś poszło nie tak. Spróbuj ponownie później',
-            type: 'error',
-          })
-        );
-
-        setTimeout(() => {
-          dispatch(removeAlert());
-        }, 5000);
-      }
-    };
-
-    fetchSeats();
-
-    if (seats.length <= 0) return;
-    findMatchingSeats(userInput.seatsNumber, userInput.areSeatsClose, seats);
-  }, [dispatch, seats, userInput, findMatchingSeats]);
 
   const markSeatAsTaken = (seat) => {
     try {
@@ -205,19 +35,98 @@ const ReservationPage = () => {
 
       dispatch(setUserSeat(seat));
     } catch (error) {
-      dispatch(
-        setAlert({
-          message: 'Błąd',
-          description: error.message,
-          type: 'error',
-        })
-      );
-
-      setTimeout(() => {
-        dispatch(removeAlert());
-      }, 5000);
+      displayAlert(dispatch, error);
     }
   };
+
+  const handleSubmit = () => {
+    try {
+      if (userInput.seatsNumber !== userSeats.length)
+        throw new Error(
+          `Hej, powinnienieś zarezerwować następującą ilość miejsc: ${userInput.seatsNumber}. \nJeśli zmieniłeś zdanie wróć na stronę główną.`
+        );
+
+      history.push('/summary');
+    } catch (error) {
+      displayAlert(dispatch, error);
+    }
+  };
+
+  const findMatchingSeats = useCallback(
+    (numberOfSeats, areSeatsClose, seats) => {
+      try {
+        const freeSeats = seats
+          .map((row) => row.filter((seat) => seat && !seat.reserved))
+          .flat();
+
+        if (freeSeats.length < numberOfSeats) {
+          throw new Error('Ups... Przykro nam, nie mamy tylu wolnych miejsc.');
+        }
+
+        if (!areSeatsClose) {
+          for (let i = 0; i < numberOfSeats; i++) {
+            dispatch(setUserSeat(freeSeats[i]));
+          }
+        } else {
+          for (let i = 0; i < freeSeats.length; i++) {
+            const result = checkSeat(i, numberOfSeats, freeSeats);
+
+            if (result.length === numberOfSeats) {
+              result.forEach((seat) => dispatch(setUserSeat(seat)));
+              break;
+            }
+
+            if (i === freeSeats.length - 1 && !result.length) {
+              throw new Error('Ups... Nie mamy tylu miejsc w jednym rzędzie!');
+            }
+          }
+        }
+      } catch (error) {
+        displayAlert(dispatch, error);
+      }
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    const fetchSeats = async () => {
+      try {
+        dispatch(clearUserSeats());
+        if (seats.length > 0) return;
+        setIsLoading(true);
+
+        const { data } = await axios(
+          `${process.env.REACT_APP_API_ENDPOINT}/seats`
+        );
+
+        const maxY = Math.max(...data.map((seat) => seat.cords.y));
+        const maxX = Math.max(...data.map((seat) => seat.cords.x));
+
+        const sortedData = Array(maxX + 1).fill(undefined);
+
+        sortedData.forEach(
+          (_, index) => (sortedData[index] = Array(maxY + 1).fill(undefined))
+        );
+
+        data.forEach((seat) => {
+          const columnIndex = seat.cords.x;
+          const rowIndex = seat.cords.y;
+          sortedData[columnIndex][rowIndex] = seat;
+        });
+
+        setIsLoading(false);
+        dispatch(setSeats(sortedData));
+      } catch (error) {
+        setIsLoading(false);
+        displayAlert(dispatch, error);
+      }
+    };
+
+    fetchSeats();
+
+    if (seats.length <= 0) return;
+    findMatchingSeats(userInput.seatsNumber, userInput.areSeatsClose, seats);
+  }, [dispatch, seats, userInput, findMatchingSeats]);
 
   return (
     <React.Fragment>
@@ -227,79 +136,15 @@ const ReservationPage = () => {
         align="middle"
         style={{ minHeight: '85vh', margin: 0 }}
       >
-        {seats.length > 0
-          ? seats.map((column) => (
-              <Col>
-                {column.map((seat) => {
-                  const backgroundColor =
-                    seat && seat.reserved
-                      ? '#434343'
-                      : seat && userSeats.includes(seat)
-                      ? '#fa8c16'
-                      : 'white';
-
-                  return (
-                    <Col style={{ marginBottom: '10px' }} key={seat?.id}>
-                      <Avatar
-                        onClick={() => markSeatAsTaken(seat)}
-                        shape="square"
-                        size="large"
-                        style={{
-                          backgroundColor: backgroundColor,
-                          border: '1px solid',
-                          borderColor: `${seat ? 'black' : 'transparent'}`,
-                        }}
-                      />
-                    </Col>
-                  );
-                })}
-              </Col>
-            ))
-          : null}
+        <AudienceView
+          seats={seats}
+          userSeats={userSeats}
+          markSeatAsTaken={markSeatAsTaken}
+        />
         {isLoading ? <Spin size="large" tip="Ładowanie..." /> : null}
       </Row>
       <Row justify="center" align="middle">
-        <Space size={30} justify="center">
-          <Space align="baseline">
-            <Avatar
-              shape="square"
-              size="large"
-              style={{
-                backgroundColor: 'white',
-                border: '1px solid',
-                borderColor: 'black',
-              }}
-            />
-            <p>Miejsca dostępne</p>
-          </Space>
-          <Space align="baseline">
-            <Avatar
-              shape="square"
-              size="large"
-              style={{
-                backgroundColor: '#434343',
-                border: '1px solid',
-                borderColor: 'black',
-              }}
-            />
-            <p>Miejsca zarezerwowane</p>
-          </Space>
-          <Space align="baseline">
-            <Avatar
-              shape="square"
-              size="large"
-              style={{
-                backgroundColor: '#fa8c16',
-                border: '1px solid',
-                borderColor: 'black',
-              }}
-            />
-            <p>Twój wybór</p>
-          </Space>
-          <Button onClick={handleSubmit} size="large" block={true}>
-            Rezerwuj
-          </Button>
-        </Space>
+        <ReservationLegend submitHandler={handleSubmit} />
       </Row>
     </React.Fragment>
   );

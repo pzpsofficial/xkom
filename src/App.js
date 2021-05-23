@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './App.css';
 import 'antd/dist/antd.css';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
@@ -10,8 +11,9 @@ import ErrorPage from './Pages/404/ErrorPage';
 import { Alert } from 'antd';
 
 function App() {
-  const { message, description, closable, type, showIcon, style, alertAction } =
-    useSelector((state) => state.alert);
+  const { message, description, closable, type, showIcon, style } = useSelector(
+    (state) => state.alert
+  );
 
   const { seatsNumber } = useSelector((state) => state.userInput);
   const { userSeats } = useSelector((state) => state.seats);
@@ -26,7 +28,6 @@ function App() {
           closable={closable}
           type={type}
           showIcon={showIcon}
-          action={alertAction}
         />
       ) : null}
       <Switch>
