@@ -18,7 +18,7 @@ const SummaryPage = () => {
           <Paragraph style={{ fontSize: '35px' }}>Wybrałeś miejsca:</Paragraph>
           {userSeats.map((seat) => {
             return (
-              <Paragraph style={{ fontSize: '35px' }}>
+              <Paragraph style={{ fontSize: '35px' }} key={seat.id}>
                 - rząd x{seat.cords.x}, miejsce y{seat.cords.y} ({seat.id})
               </Paragraph>
             );

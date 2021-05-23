@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 import { setAlert, removeAlert } from '../../app/slices/alertSlice';
 import { useSelector, useDispatch } from 'react-redux';
@@ -20,6 +20,44 @@ const ReservationPage = () => {
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const findMatchingSeats = useCallback(
+    (numberOfSeats, seats) => {
+      try {
+        const freeSeats = seats
+          .map((row) => row.filter((seat) => seat && !seat.reserved))
+          .flat();
+
+        if (freeSeats < numberOfSeats.length) {
+          throw new Error('Ups... Przykro nam, nie mamy tylu wolnych miejsc.');
+        }
+
+        for (let i = 0; i < numberOfSeats; i++) {
+          console.log('siema');
+
+          const seat = freeSeats[i];
+          console.log(seat);
+
+          dispatch(setUserSeat(seat));
+        }
+      } catch (error) {
+        dispatch(
+          setAlert({
+            message: 'Ostrzeżenie',
+            description: error.message,
+            type: 'warning',
+            closable: true,
+          })
+        );
+
+        setTimeout(() => {
+          dispatch(removeAlert());
+          history.push('/');
+        }, 5000);
+      }
+    },
+    [dispatch, history]
+  );
 
   const handleSubmit = (e) => {
     try {
@@ -97,7 +135,10 @@ const ReservationPage = () => {
     };
 
     fetchSeats();
-  }, [dispatch, seats]);
+
+    if (seats.length <= 0) return;
+    findMatchingSeats(userInput.seatsNumber, seats);
+  }, [dispatch, seats, userInput.seatsNumber, findMatchingSeats]);
 
   const markSeatAsTaken = (seat) => {
     try {
