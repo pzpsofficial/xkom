@@ -22,23 +22,75 @@ const ReservationPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const findMatchingSeats = useCallback(
-    (numberOfSeats, seats) => {
+    (numberOfSeats, closeSeats, seats) => {
       try {
         const freeSeats = seats
           .map((row) => row.filter((seat) => seat && !seat.reserved))
           .flat();
 
-        if (freeSeats < numberOfSeats.length) {
+        if (freeSeats.length < numberOfSeats) {
           throw new Error('Ups... Przykro nam, nie mamy tylu wolnych miejsc.');
         }
 
-        for (let i = 0; i < numberOfSeats; i++) {
-          console.log('siema');
+        if (!closeSeats) {
+          for (let i = 0; i < numberOfSeats; i++) {
+            const seat = freeSeats[i];
+            dispatch(setUserSeat(seat));
+          }
+        } else {
+          const checkSeat = (index) => {
+            const pickedSeats = [];
 
-          const seat = freeSeats[i];
-          console.log(seat);
+            for (let i = index; i < index + numberOfSeats; i++) {
+              if (i === index) {
+                pickedSeats.push(freeSeats[i]);
+                continue;
+              }
 
-          dispatch(setUserSeat(seat));
+              const seat = pickedSeats.length
+                ? pickedSeats[pickedSeats.length - 1]
+                : freeSeats[i];
+
+              const nextSeat = freeSeats.find(
+                (nSeat) =>
+                  seat &&
+                  nSeat.cords.y === seat.cords.y &&
+                  nSeat.cords.x === seat.cords.x + 1
+              );
+              const prevSeat = freeSeats.find(
+                (pSeat) =>
+                  seat &&
+                  pSeat.cords.y === seat.cords.y &&
+                  pSeat.cords.x === seat.cords.x - 1
+              );
+
+              if (
+                (!nextSeat && pickedSeats.includes(prevSeat)) ||
+                (!prevSeat && pickedSeats.includes(nextSeat)) ||
+                !nextSeat ||
+                !prevSeat
+              ) {
+                pickedSeats.length = 0;
+              } else {
+                pickedSeats.push(nextSeat ? nextSeat : prevSeat);
+              }
+            }
+
+            return pickedSeats;
+          };
+
+          for (let i = 0; i < freeSeats.length; i++) {
+            const result = checkSeat(i);
+
+            if (result.length === numberOfSeats) {
+              result.forEach((seat) => dispatch(setUserSeat(seat)));
+              break;
+            }
+
+            if (i === freeSeats.length - 1 && !result.length) {
+              throw new Error('Ups... Nie mamy tylu miejsc w jednym rzędzie!');
+            }
+          }
         }
       } catch (error) {
         dispatch(
@@ -137,8 +189,8 @@ const ReservationPage = () => {
     fetchSeats();
 
     if (seats.length <= 0) return;
-    findMatchingSeats(userInput.seatsNumber, seats);
-  }, [dispatch, seats, userInput.seatsNumber, findMatchingSeats]);
+    findMatchingSeats(userInput.seatsNumber, userInput.areSeatsClose, seats);
+  }, [dispatch, seats, userInput, findMatchingSeats]);
 
   const markSeatAsTaken = (seat) => {
     try {
