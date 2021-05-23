@@ -67,8 +67,8 @@ const ReservationPage = () => {
               if (
                 (!nextSeat && pickedSeats.includes(prevSeat)) ||
                 (!prevSeat && pickedSeats.includes(nextSeat)) ||
-                !nextSeat ||
-                !prevSeat
+                (!prevSeat && seat && seat.cords.x > 0) ||
+                (!nextSeat && seat && seat.cords.x < 14)
               ) {
                 pickedSeats.length = 0;
               } else {
@@ -239,7 +239,7 @@ const ReservationPage = () => {
                       : 'white';
 
                   return (
-                    <Col style={{ marginBottom: '10px' }}>
+                    <Col style={{ marginBottom: '10px' }} key={seat?.id}>
                       <Avatar
                         onClick={() => markSeatAsTaken(seat)}
                         shape="square"
