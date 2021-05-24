@@ -16,16 +16,24 @@ export const seatsDataSlice = createSlice({
       };
     },
     insertNewlyReservedSeats: (state, action) => {
-      const oldSeats = [...state.seats];
-
-      action.payload.forEach((userSeat) => {
-        const index = oldSeats.indexOf(userSeat);
-        oldSeats[index] = { ...oldSeats[index], reserved: true };
-      });
-
       return {
         ...state,
-        seats: [...oldSeats],
+        seats: [
+          ...state.seats.map((row) => {
+            return [
+              ...row.map((seat) => {
+                if (!seat) return seat;
+
+                if (
+                  action.payload.find((userSeat) => userSeat.id === seat.id)
+                ) {
+                  return { ...seat, reserved: true };
+                }
+                return seat;
+              }),
+            ];
+          }),
+        ],
         userSeats: action.payload,
       };
     },

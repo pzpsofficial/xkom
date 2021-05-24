@@ -22,9 +22,15 @@ export const userInputSlice = createSlice({
         areSeatsClose: action.payload,
       };
     },
+    clearUserInput: () => {
+      return {
+        ...initialState,
+      };
+    },
   },
 });
 
-export const { setSeatsNumber, setAreSeatsClose } = userInputSlice.actions;
+export const { setSeatsNumber, setAreSeatsClose, clearUserInput } =
+  userInputSlice.actions;
 
 export default userInputSlice.reducer;

@@ -1,6 +1,6 @@
 import { setAlert, removeAlert } from '../app/slices/alertSlice';
 
-export const displayAlert = (dispatch, history, error) => {
+export const displayAlert = (dispatch, history, error, withRedirect) => {
   dispatch(
     setAlert({
       message: 'Błąd',
@@ -11,7 +11,10 @@ export const displayAlert = (dispatch, history, error) => {
 
   setTimeout(() => {
     dispatch(removeAlert());
-    history.push('/');
+
+    if (withRedirect) {
+      history.push('/');
+    }
   }, 5000);
 };
 

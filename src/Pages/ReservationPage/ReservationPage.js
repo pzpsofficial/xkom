@@ -8,6 +8,7 @@ import {
   clearUserSeats,
   insertNewlyReservedSeats,
 } from '../../app/slices/seatsDataSlice';
+import { clearUserInput } from '../../app/slices/userInputSlice';
 import { useHistory } from 'react-router-dom';
 
 import AudienceView from '../../components/AudienceView/AudienceView';
@@ -57,6 +58,7 @@ const ReservationPage = () => {
         );
 
       dispatch(insertNewlyReservedSeats(userSeats));
+      dispatch(clearUserInput());
       history.push('/summary');
     } catch (error) {
       displayAlert(dispatch, history, error);
@@ -95,7 +97,7 @@ const ReservationPage = () => {
           }
         }
       } catch (error) {
-        displayAlert(dispatch, history, error);
+        displayAlert(dispatch, history, error, true);
       }
     },
     [dispatch, history]
