@@ -77,7 +77,7 @@ describe('test seats data slice', () => {
     });
   });
 
-  test('user seats are cleared correctly', () => {
+  test('userSeats are cleared correctly', () => {
     const result = reducer(exampleDataTwo, clearUserSeats());
 
     expect(result.userSeats).toStrictEqual([]);
