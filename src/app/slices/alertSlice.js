@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
+export const initialState = {
   message: '',
   description: '',
   type: '',
@@ -37,6 +37,7 @@ export const alertSlice = createSlice({
         message: '',
         description: '',
         type: '',
+        closable: false,
       };
     },
   },
