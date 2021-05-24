@@ -1,8 +1,9 @@
 import React from 'react';
 
+import ReservationsList from '../../components/ReservationsList/ReservationsList';
+
 import { Row, Space, Typography } from 'antd';
 import { useSelector } from 'react-redux';
-import ReservationsList from '../../components/ReservationsList/ReservationsList';
 
 const { Title } = Typography;
 

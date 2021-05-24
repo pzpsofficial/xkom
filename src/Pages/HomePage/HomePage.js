@@ -5,10 +5,11 @@ import {
   setAreSeatsClose,
 } from '../../app/slices/userInputSlice';
 import { setAlert, removeAlert } from '../../app/slices/alertSlice';
-import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+
 import HomePageForm from '../../components/HomePageForm/HomePageForm';
 
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Row } from 'antd';
 
 const HomePage = () => {
@@ -47,7 +48,7 @@ const HomePage = () => {
   };
 
   return (
-    <Row style={{ minHeight: '100vh' }} align="middle" justify={'center'}>
+    <Row style={{ minHeight: '100vh' }} align="middle" justify="center">
       <HomePageForm
         submitHandler={handleSubmit}
         checkboxChangeHandler={handleCheckboxChange}

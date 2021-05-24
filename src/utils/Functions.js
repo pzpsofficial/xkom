@@ -9,12 +9,12 @@ export const displayAlert = (dispatch, history, error, withRedirect) => {
     })
   );
 
+  if (withRedirect) {
+    history.push('/');
+  }
+
   setTimeout(() => {
     dispatch(removeAlert());
-
-    if (withRedirect) {
-      history.push('/');
-    }
   }, 5000);
 };
 
@@ -56,4 +56,27 @@ export const checkSeat = (index, numberOfSeats, freeSeats) => {
   }
 
   return pickedSeats;
+};
+
+export const getSeatStyles = (seat, userSeats) => {
+  const seatStyles = {
+    backgroundColor: 'white',
+    border: '1px solid',
+    borderColor: 'black',
+  };
+
+  if (!seat) {
+    seatStyles.borderColor = 'transparent';
+    return seatStyles;
+  }
+
+  if (seat.reserved) {
+    seatStyles.backgroundColor = '#434343';
+  }
+
+  if (userSeats.includes(seat)) {
+    seatStyles.backgroundColor = '#fa8c16';
+  }
+
+  return seatStyles;
 };

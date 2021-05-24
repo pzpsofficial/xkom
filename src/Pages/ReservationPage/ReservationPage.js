@@ -1,20 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
 import { checkSeat, displayAlert } from '../../utils/Functions';
+import { clearUserInput } from '../../app/slices/userInputSlice';
 import {
   setSeats,
   clearUserSeats,
   insertNewlyReservedSeats,
 } from '../../app/slices/seatsDataSlice';
-import { clearUserInput } from '../../app/slices/userInputSlice';
-import { useHistory } from 'react-router-dom';
 
 import AudienceView from '../../components/AudienceView/AudienceView';
 import ReservationLegend from '../../components/ReservationLegend/ReservationLegend';
 
 import { Row, Spin } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import axios from 'axios';
 
 const ReservationPage = () => {
   const dispatch = useDispatch();

@@ -2,13 +2,15 @@ import React from 'react';
 
 import './App.css';
 import 'antd/dist/antd.css';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+
 import HomePage from './Pages/HomePage/HomePage';
 import ReservationPage from './Pages/ReservationPage/ReservationPage';
 import SummaryPage from './Pages/SummaryPage/SummaryPage';
 import ErrorPage from './Pages/404/ErrorPage';
+
 import { Alert } from 'antd';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function App() {
   const { message, description, closable, type, showIcon, style } = useSelector(
