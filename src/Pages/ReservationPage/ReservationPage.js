@@ -129,6 +129,8 @@ const ReservationPage = () => {
           sortedData[columnIndex][rowIndex] = seat;
         });
 
+        console.log(sortedData);
+
         setIsLoading(false);
         dispatch(setSeats(sortedData));
       } catch (error) {
