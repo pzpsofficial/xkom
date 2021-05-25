@@ -10,7 +10,7 @@ Co zrobić, aby skorzystać z aplikacji?
 
 ## `npm run api`
 
-Jest to skrpyt, który uruchomi lokalny serwer imitujący bazę danych.
+Jest to skrypt, który uruchomi lokalny serwer imitujący bazę danych.
 
 ### `yarn start`
 
