@@ -12,6 +12,10 @@ Co zrobić, aby skorzystać z aplikacji?
 
 Jest to skrypt, który uruchomi lokalny serwer imitujący bazę danych.
 
+## `npm install`
+
+Jest to skrypt, który instaluje wszystkie niezbędne zależności.
+
 ### `yarn start`
 
 Jest to skrypt, który uruchamia aplikację.
