@@ -48,7 +48,12 @@ const HomePage = () => {
   };
 
   return (
-    <Row style={{ minHeight: '100vh' }} align="middle" justify="center">
+    <Row
+      data-test="homepage"
+      style={{ minHeight: '100vh' }}
+      align="middle"
+      justify="center"
+    >
       <HomePageForm
         submitHandler={handleSubmit}
         checkboxChangeHandler={handleCheckboxChange}
