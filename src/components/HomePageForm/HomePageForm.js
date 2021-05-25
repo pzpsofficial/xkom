@@ -10,7 +10,7 @@ const HomePageForm = ({
   checkboxState,
 }) => {
   return (
-    <Form onFinish={submitHandler} colon={false}>
+    <Form onFinish={submitHandler} colon={false} data-test="homepage-form">
       <Form.Item
         label="Liczba miejsc: "
         rules={[
@@ -31,7 +31,11 @@ const HomePageForm = ({
         />
       </Form.Item>
       <Form.Item>
-        <Checkbox checked={checkboxState} onChange={checkboxChangeHandler}>
+        <Checkbox
+          data-test="checkbox"
+          checked={checkboxState}
+          onChange={checkboxChangeHandler}
+        >
           Czy miejsca mają być obok siebie?
         </Checkbox>
       </Form.Item>

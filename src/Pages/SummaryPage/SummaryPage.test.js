@@ -1,6 +1,6 @@
 import { findByTestAttr } from '../../utils/testUtils';
 import { mount } from 'enzyme';
-import HomePage from './HomePage';
+import SummaryPage from './SummaryPage';
 import { reducer } from './../../app/store';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
@@ -10,21 +10,15 @@ const setup = (preloadedState = {}) => {
 
   return mount(
     <Provider store={store}>
-      <HomePage />
+      <SummaryPage />
     </Provider>
   );
 };
 
-describe('test homePage', () => {
+describe('test reservationPage', () => {
   test('renders without errors', () => {
     const wrapper = setup();
-    const homePage = findByTestAttr(wrapper, 'homepage');
-    expect(homePage.exists()).toBe(true);
-  });
-
-  test('renders form without error', () => {
-    const wrapper = setup();
-    const form = findByTestAttr(wrapper, 'homepage-form');
-    expect(form.exists()).toBe(true);
+    const summaryPage = findByTestAttr(wrapper, 'summary-page');
+    expect(summaryPage.exists()).toBe(true);
   });
 });

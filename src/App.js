@@ -36,7 +36,7 @@ function App() {
           <HomePage />
         </Route>
         <Route path="/reservation">
-          {seatsNumber ? <ReservationPage /> : <Redirect to="/" />}
+          {seatsNumber > 0 ? <ReservationPage /> : <Redirect to="/" />}
         </Route>
         <Route path="/summary">
           {userSeats.length > 0 ? <SummaryPage /> : <Redirect to="/" />}

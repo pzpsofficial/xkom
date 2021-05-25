@@ -11,7 +11,7 @@ const SummaryPage = () => {
   const { userSeats } = useSelector((state) => state.seats);
 
   return (
-    <Row style={{ padding: '40px' }}>
+    <Row style={{ padding: '40px' }} data-test="summary-page">
       <Space direction="vertical" size={40}>
         <Title style={{ fontWeight: 'bold' }}>
           Twoja rezerwacja przebiegła pomyślnie!

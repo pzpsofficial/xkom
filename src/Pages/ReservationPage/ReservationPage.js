@@ -129,8 +129,6 @@ const ReservationPage = () => {
           sortedData[columnIndex][rowIndex] = seat;
         });
 
-        console.log(sortedData);
-
         setIsLoading(false);
         dispatch(setSeats(sortedData));
       } catch (error) {
@@ -152,6 +150,7 @@ const ReservationPage = () => {
         justify="center"
         align="middle"
         style={{ minHeight: '85vh', margin: 0 }}
+        data-test="reservation-page"
       >
         <AudienceView
           seats={seats}
