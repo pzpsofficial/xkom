@@ -111,7 +111,11 @@ const ReservationPage = () => {
         setIsLoading(true);
 
         const { data } = await axios(
-          `${process.env.REACT_APP_API_ENDPOINT}/seats`
+          `${
+            process.env.REACT_APP_API_ENDPOINT
+              ? process.env.REACT_APP_API_ENDPOINT
+              : 'http://localhost:3000'
+          }/seats`
         );
 
         const maxY = Math.max(...data.map((seat) => seat.cords.y));
